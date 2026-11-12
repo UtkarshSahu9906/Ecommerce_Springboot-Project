@@ -151,6 +151,6 @@ Product image upload, address management, a payment flow, email notifications, R
 ## Contact
 
 **Your Name**
-GitHub: [@your-username](https://github.com/your-username) · LinkedIn: [your-linkedin](https://in.linkedin.com/in/utkarshsahu9906) · utkarshsahu9906@gmail.com
+GitHub: [@UtkarshSahu9906](https://github.com/UtkarshSahu9906) · LinkedIn: [your-linkedin](https://in.linkedin.com/in/utkarshsahu9906) · utkarshsahu9906@gmail.com
 
 I'm open to backend developer roles and would be glad to talk about this project.
