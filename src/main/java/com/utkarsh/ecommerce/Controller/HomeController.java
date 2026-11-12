@@ -1,5 +1,6 @@
 package com.utkarsh.ecommerce.Controller;
 
+import com.utkarsh.ecommerce.DTO.HomeResponseDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -9,12 +10,10 @@ import java.util.Map;
 public class HomeController {
 
     @GetMapping("/hello")
-    public Map<String, Object> hello() {
-
-        return Map.of(
-                "message", "Welcome to E-Commerce Application!",
-                "application", "ecommerce",
-                "status", "success"
-        );
+  public HomeResponseDTO hello(){
+        return new HomeResponseDTO(
+                "Welcome to E-Commerce Application!",
+                "ecommerce",
+                "success");
     }
 }

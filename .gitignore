@@ -14,7 +14,7 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -32,16 +32,8 @@ build/
 ### VS Code ###
 .vscode/
 
-
-# Maven
-target/
-
-# IntelliJ
-.idea/
-*.iml
-
-# Environment variables
+### Environment Variables ###
 .env
 
-# Logs
+### Logs ###
 *.log
