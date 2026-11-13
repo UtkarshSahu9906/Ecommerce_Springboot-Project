@@ -24,14 +24,13 @@ public class CategoryController {
             @RequestBody CategoryRequestDTO requestDTO) {
 
         return categoryService.createCategory(requestDTO);
-    }
-    @GetMapping
-    public List<Category> getAllCategories() {
+    }@GetMapping
+    public List<CategoryResponseDTO> getAllCategories() {
         return categoryService.getAllCategories();
     }
-    @GetMapping("/{id}")
-    public Category getCategoryById(@PathVariable Long id) {
 
+    @GetMapping("/{id}")
+    public CategoryResponseDTO getCategoryById(@PathVariable Long id) {
         return categoryService.getCategoryById(id);
     }
     @PutMapping("/{id}")

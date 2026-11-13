@@ -7,6 +7,7 @@ import com.utkarsh.ecommerce.Entity.Category;
 import com.utkarsh.ecommerce.Repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -37,14 +38,25 @@ public class CategoryService {
         responseDTO.setDescription(savedCategory.getDescription());
 
         return responseDTO;
-    }
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
-    }
-    public Category getCategoryById(Long id) {
+    }public List<CategoryResponseDTO> getAllCategories() {
 
-        return categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
+        List<Category> categories = categoryRepository.findAll();
+
+        List<CategoryResponseDTO> responseList = new ArrayList<>();
+
+        for (Category category : categories) {
+            responseList.add(convertToResponseDTO(category));
+        }
+
+        return responseList;
+    }
+    public CategoryResponseDTO getCategoryById(Long id) {
+
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Category not found with id: " + id));
+
+        return convertToResponseDTO(category);
     }
     public Category updateCategory(Long id, Category updatedCategory) {
 
@@ -56,6 +68,16 @@ public class CategoryService {
         existingCategory.setDescription(updatedCategory.getDescription());
 
         return categoryRepository.save(existingCategory);
+    }
+    private CategoryResponseDTO convertToResponseDTO(Category category) {
+
+        CategoryResponseDTO responseDTO = new CategoryResponseDTO();
+
+        responseDTO.setId(category.getId());
+        responseDTO.setName(category.getName());
+        responseDTO.setDescription(category.getDescription());
+
+        return responseDTO;
     }
     public void deleteCategory(Long id) {
 
