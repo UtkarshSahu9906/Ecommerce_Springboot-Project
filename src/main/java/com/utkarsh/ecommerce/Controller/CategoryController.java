@@ -4,6 +4,8 @@ import com.utkarsh.ecommerce.Entity.Category;
 import com.utkarsh.ecommerce.Service.CategoryService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/categories")
 public class CategoryController {
@@ -19,5 +21,9 @@ public class CategoryController {
     public Category createCategory(@RequestBody Category category) {
 
         return categoryService.createCategory(category);
+    }
+    @GetMapping
+    public List<Category> getAllCategories() {
+        return categoryService.getAllCategories();
     }
 }
