@@ -38,4 +38,11 @@ public class CategoryController {
 
         return categoryService.updateCategory(id, category);
     }
+    @DeleteMapping("/{id}")
+    public String deleteCategory(@PathVariable Long id) {
+
+        categoryService.deleteCategory(id);
+
+        return "Category deleted successfully";
+    }
 }

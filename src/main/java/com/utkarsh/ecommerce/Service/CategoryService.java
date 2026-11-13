@@ -39,4 +39,12 @@ public class CategoryService {
 
         return categoryRepository.save(existingCategory);
     }
+    public void deleteCategory(Long id) {
+
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Category not found with id: " + id));
+
+        categoryRepository.delete(category);
+    }
 }
