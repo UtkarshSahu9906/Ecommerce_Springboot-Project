@@ -1,6 +1,8 @@
 package com.utkarsh.ecommerce.Service;
 
 
+import com.utkarsh.ecommerce.DTO.CategoryRequestDTO;
+import com.utkarsh.ecommerce.DTO.CategoryResponseDTO;
 import com.utkarsh.ecommerce.Entity.Category;
 import com.utkarsh.ecommerce.Repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -16,9 +18,25 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public Category createCategory(Category category) {
+    public CategoryResponseDTO createCategory(CategoryRequestDTO requestDTO) {
 
-        return categoryRepository.save(category);
+        // Convert DTO into Entity
+        Category category = new Category();
+
+        category.setName(requestDTO.getName());
+        category.setDescription(requestDTO.getDescription());
+
+        // Save Entity into database
+        Category savedCategory = categoryRepository.save(category);
+
+        // Convert Entity into Response DTO
+        CategoryResponseDTO responseDTO = new CategoryResponseDTO();
+
+        responseDTO.setId(savedCategory.getId());
+        responseDTO.setName(savedCategory.getName());
+        responseDTO.setDescription(savedCategory.getDescription());
+
+        return responseDTO;
     }
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();

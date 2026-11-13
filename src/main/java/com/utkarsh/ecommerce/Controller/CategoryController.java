@@ -1,5 +1,7 @@
 package com.utkarsh.ecommerce.Controller;
 
+import com.utkarsh.ecommerce.DTO.CategoryRequestDTO;
+import com.utkarsh.ecommerce.DTO.CategoryResponseDTO;
 import com.utkarsh.ecommerce.Entity.Category;
 import com.utkarsh.ecommerce.Service.CategoryService;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +20,10 @@ public class CategoryController {
     }
 
     @PostMapping
-    public Category createCategory(@RequestBody Category category) {
+    public CategoryResponseDTO createCategory(
+            @RequestBody CategoryRequestDTO requestDTO) {
 
-        return categoryService.createCategory(category);
+        return categoryService.createCategory(requestDTO);
     }
     @GetMapping
     public List<Category> getAllCategories() {
