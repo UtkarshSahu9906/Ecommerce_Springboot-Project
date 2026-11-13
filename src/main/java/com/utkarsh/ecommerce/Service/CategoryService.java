@@ -28,4 +28,15 @@ public class CategoryService {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
     }
+    public Category updateCategory(Long id, Category updatedCategory) {
+
+        Category existingCategory = categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Category not found with id: " + id));
+
+        existingCategory.setName(updatedCategory.getName());
+        existingCategory.setDescription(updatedCategory.getDescription());
+
+        return categoryRepository.save(existingCategory);
+    }
 }
