@@ -1,33 +1,23 @@
 package com.utkarsh.ecommerce.Controller;
 
+import com.utkarsh.ecommerce.Entity.Category;
+import com.utkarsh.ecommerce.Service.CategoryService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/categories")
 public class CategoryController {
 
-    @GetMapping
-    public String getCategories() {
-        return "Get all categories";
+    private final CategoryService categoryService;
+
+    // Constructor Injection
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
     }
 
     @PostMapping
-    public String createCategory() {
-        return "Category created";
-    }
+    public Category createCategory(@RequestBody Category category) {
 
-    @PutMapping("/{id}")
-    public String updateCategory() {
-        return "Category updated";
-    }
-
-    @PatchMapping("/{id}")
-    public String updateCategoryPartially() {
-        return "Category partially updated";
-    }
-
-    @DeleteMapping("/{id}")
-    public String deleteCategory() {
-        return "Category deleted";
+        return categoryService.createCategory(category);
     }
 }
