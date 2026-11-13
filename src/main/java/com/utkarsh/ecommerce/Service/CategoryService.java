@@ -58,16 +58,18 @@ public class CategoryService {
 
         return convertToResponseDTO(category);
     }
-    public Category updateCategory(Long id, Category updatedCategory) {
+    public CategoryResponseDTO updateCategory(Long id, CategoryRequestDTO requestDTO) {
 
         Category existingCategory = categoryRepository.findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("Category not found with id: " + id));
 
-        existingCategory.setName(updatedCategory.getName());
-        existingCategory.setDescription(updatedCategory.getDescription());
+        existingCategory.setName(requestDTO.getName());
+        existingCategory.setDescription(requestDTO.getDescription());
 
-        return categoryRepository.save(existingCategory);
+        Category updatedCategory = categoryRepository.save(existingCategory);
+
+        return convertToResponseDTO(updatedCategory);
     }
     private CategoryResponseDTO convertToResponseDTO(Category category) {
 

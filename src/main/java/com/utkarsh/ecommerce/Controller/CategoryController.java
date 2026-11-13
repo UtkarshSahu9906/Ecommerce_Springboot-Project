@@ -4,6 +4,7 @@ import com.utkarsh.ecommerce.DTO.CategoryRequestDTO;
 import com.utkarsh.ecommerce.DTO.CategoryResponseDTO;
 import com.utkarsh.ecommerce.Entity.Category;
 import com.utkarsh.ecommerce.Service.CategoryService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,17 +35,17 @@ public class CategoryController {
         return categoryService.getCategoryById(id);
     }
     @PutMapping("/{id}")
-    public Category updateCategory(
+    public CategoryResponseDTO updateCategory(
             @PathVariable Long id,
-            @RequestBody Category category) {
+            @RequestBody CategoryRequestDTO requestDTO) {
 
-        return categoryService.updateCategory(id, category);
+        return categoryService.updateCategory(id, requestDTO);
     }
     @DeleteMapping("/{id}")
-    public String deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
 
         categoryService.deleteCategory(id);
 
-        return "Category deleted successfully";
+        return ResponseEntity.noContent().build();
     }
 }
