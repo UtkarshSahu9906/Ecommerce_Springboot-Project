@@ -1,4 +1,4 @@
-package com.utkarsh.ecommerce.DTO.;
+package com.utkarsh.ecommerce.DTO;
 
 public class UserResponseDTO {
 
