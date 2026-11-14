@@ -67,4 +67,15 @@ public class ProductController {
 
         return productService.getProductsWithPagination(page, size);
     }
+    @GetMapping("/sort")
+    public Page<ProductResponseDTO> getProductsWithSorting(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "price") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+
+        return productService.getProductsWithSorting(
+                page, size, sortBy, direction
+        );
+    }
 }

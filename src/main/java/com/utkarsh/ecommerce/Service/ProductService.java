@@ -8,6 +8,7 @@ import com.utkarsh.ecommerce.exception.ResourceNotFoundException;
 import com.utkarsh.ecommerce.Repository.CategoryRepository;
 import com.utkarsh.ecommerce.Repository.ProductRepository;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +28,19 @@ public class ProductService {
 
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+    }
+    public Page<ProductResponseDTO> getProductsWithSorting(
+            int page, int size, String sortBy, String direction) {
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Product> products = productRepository.findAll(pageable);
+
+        return products.map(this::convertToResponseDTO);
     }
 
 
