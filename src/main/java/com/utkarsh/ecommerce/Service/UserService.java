@@ -5,6 +5,7 @@ import com.utkarsh.ecommerce.DTO.UserResponseDTO;
 import com.utkarsh.ecommerce.Entity.User;
 import com.utkarsh.ecommerce.Repository.UserRepository;
 import com.utkarsh.ecommerce.DTO.UserRegistrationRequestDTO;
+import com.utkarsh.ecommerce.exception.InvalidCredentialsException;
 import com.utkarsh.ecommerce.exception.ResourceNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,8 +27,7 @@ public class UserService {
             UserRegistrationRequestDTO requestDTO) {
 
         if (userRepository.existsByEmail(requestDTO.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
-        }
+            throw new InvalidCredentialsException("Invalid email or password");        }
 
         User user = new User();
 
@@ -63,8 +63,7 @@ public class UserService {
         );
 
         if (!passwordMatches) {
-            throw new IllegalArgumentException("Invalid email or password");
-        }
+            throw new InvalidCredentialsException("Invalid email or password");        }
 
         UserResponseDTO responseDTO = new UserResponseDTO();
 
