@@ -7,6 +7,9 @@ import com.utkarsh.ecommerce.dto.ProductRequestDTO;
 import com.utkarsh.ecommerce.exception.ResourceNotFoundException;
 import com.utkarsh.ecommerce.Repository.CategoryRepository;
 import com.utkarsh.ecommerce.Repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -73,6 +76,15 @@ public class ProductService {
 
         return responseList;
     }
+    public Page<ProductResponseDTO> getProductsWithPagination(
+            int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Product> productPage = productRepository.findAll(pageable);
+
+        return productPage.map(this::convertToResponseDTO);
+    }
 
     public ProductResponseDTO getProductById(Long id) {
 
@@ -108,5 +120,15 @@ public class ProductService {
         Product updatedProduct = productRepository.save(product);
 
         return convertToResponseDTO(updatedProduct);
+    }
+    public void deleteProduct(Long id) {
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Product not found with id: " + id
+                        ));
+
+        productRepository.delete(product);
     }
 }

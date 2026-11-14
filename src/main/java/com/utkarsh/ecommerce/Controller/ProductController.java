@@ -5,6 +5,8 @@ import com.utkarsh.ecommerce.Service.ProductService;
 import com.utkarsh.ecommerce.dto.ProductRequestDTO;
 
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,5 +43,19 @@ public class ProductController {
             @Valid @RequestBody ProductRequestDTO requestDTO) {
 
         return productService.updateProduct(id, requestDTO);
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+
+        productService.deleteProduct(id);
+
+        return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/page")
+    public Page<ProductResponseDTO> getProductsWithPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+
+        return productService.getProductsWithPagination(page, size);
     }
 }
