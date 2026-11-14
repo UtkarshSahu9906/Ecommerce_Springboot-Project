@@ -1,12 +1,14 @@
 package com.utkarsh.ecommerce.Service;
 
 import com.utkarsh.ecommerce.DTO.LoginRequestDTO;
+import com.utkarsh.ecommerce.DTO.LoginResponseDTO;
 import com.utkarsh.ecommerce.DTO.UserResponseDTO;
 import com.utkarsh.ecommerce.Entity.User;
 import com.utkarsh.ecommerce.Repository.UserRepository;
 import com.utkarsh.ecommerce.DTO.UserRegistrationRequestDTO;
 import com.utkarsh.ecommerce.exception.InvalidCredentialsException;
 import com.utkarsh.ecommerce.exception.ResourceNotFoundException;
+import com.utkarsh.ecommerce.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +17,16 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public UserService(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService) {
 
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
     public UserResponseDTO registerUser(
             UserRegistrationRequestDTO requestDTO) {
@@ -51,28 +56,28 @@ public class UserService {
 
         return responseDTO;
     }
-    public UserResponseDTO login(LoginRequestDTO requestDTO) {
+    public LoginResponseDTO login(LoginRequestDTO requestDTO) {
 
         User user = userRepository.findByEmail(requestDTO.getEmail())
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Invalid email or password"));
+                        new InvalidCredentialsException("Invalid email or password"));
 
-        boolean passwordMatches = passwordEncoder.matches(
+        if (!passwordEncoder.matches(
                 requestDTO.getPassword(),
-                user.getPassword()
-        );
+                user.getPassword())) {
 
-        if (!passwordMatches) {
-            throw new InvalidCredentialsException("Invalid email or password");        }
+            throw new InvalidCredentialsException("Invalid email or password");
+        }
+
+        String token = jwtService.generateToken(user.getEmail());
 
         UserResponseDTO responseDTO = new UserResponseDTO();
-
         responseDTO.setId(user.getId());
         responseDTO.setName(user.getName());
         responseDTO.setEmail(user.getEmail());
         responseDTO.setRole(user.getRole());
 
-        return responseDTO;
+        return new LoginResponseDTO(token, responseDTO);
     }
 
 }
