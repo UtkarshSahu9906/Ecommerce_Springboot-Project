@@ -21,6 +21,7 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
+
     @PostMapping
     public CategoryResponseDTO createCategory(
             @Valid @RequestBody CategoryRequestDTO requestDTO) {
