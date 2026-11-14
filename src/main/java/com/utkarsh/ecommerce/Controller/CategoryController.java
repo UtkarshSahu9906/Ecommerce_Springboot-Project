@@ -4,6 +4,7 @@ import com.utkarsh.ecommerce.DTO.CategoryRequestDTO;
 import com.utkarsh.ecommerce.DTO.CategoryResponseDTO;
 import com.utkarsh.ecommerce.Entity.Category;
 import com.utkarsh.ecommerce.Service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,10 +23,12 @@ public class CategoryController {
 
     @PostMapping
     public CategoryResponseDTO createCategory(
-            @RequestBody CategoryRequestDTO requestDTO) {
+            @Valid @RequestBody CategoryRequestDTO requestDTO) {
 
         return categoryService.createCategory(requestDTO);
-    }@GetMapping
+    }
+
+    @GetMapping
     public List<CategoryResponseDTO> getAllCategories() {
         return categoryService.getAllCategories();
     }
@@ -37,7 +40,7 @@ public class CategoryController {
     @PutMapping("/{id}")
     public CategoryResponseDTO updateCategory(
             @PathVariable Long id,
-            @RequestBody CategoryRequestDTO requestDTO) {
+            @Valid @RequestBody CategoryRequestDTO requestDTO) {
 
         return categoryService.updateCategory(id, requestDTO);
     }

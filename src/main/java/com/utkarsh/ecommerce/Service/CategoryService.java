@@ -5,6 +5,7 @@ import com.utkarsh.ecommerce.DTO.CategoryRequestDTO;
 import com.utkarsh.ecommerce.DTO.CategoryResponseDTO;
 import com.utkarsh.ecommerce.Entity.Category;
 import com.utkarsh.ecommerce.Repository.CategoryRepository;
+import com.utkarsh.ecommerce.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -54,7 +55,9 @@ public class CategoryService {
 
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Category not found with id: " + id));
+                        new ResourceNotFoundException(
+                                "Category not found with id: " + id
+                        ));
 
         return convertToResponseDTO(category);
     }
