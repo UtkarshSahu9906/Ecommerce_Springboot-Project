@@ -22,10 +22,12 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public List<ProductResponseDTO> searchProducts(
-            @RequestParam String name) {
+    public Page<ProductResponseDTO> searchProducts(
+            @RequestParam String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
 
-        return productService.searchProductsByName(name);
+        return productService.searchProducts(name, page, size);
     }
 
     @PostMapping

@@ -7,10 +7,10 @@ import com.utkarsh.ecommerce.dto.ProductRequestDTO;
 import com.utkarsh.ecommerce.exception.ResourceNotFoundException;
 import com.utkarsh.ecommerce.Repository.CategoryRepository;
 import com.utkarsh.ecommerce.Repository.ProductRepository;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,18 +29,18 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<ProductResponseDTO> searchProductsByName(String name) {
 
-        List<Product> products =
-                productRepository.findByNameContainingIgnoreCase(name);
+    public Page<ProductResponseDTO> searchProducts(
+            String name, int page, int size) {
 
-        List<ProductResponseDTO> responseList = new ArrayList<>();
+        Pageable pageable = PageRequest.of(page, size);
 
-        for (Product product : products) {
-            responseList.add(convertToResponseDTO(product));
-        }
+        Page<Product> products =
+                productRepository.findByNameContainingIgnoreCase(
+                        name, pageable
+                );
 
-        return responseList;
+        return products.map(this::convertToResponseDTO);
     }
 
     private ProductResponseDTO convertToResponseDTO(Product product) {
