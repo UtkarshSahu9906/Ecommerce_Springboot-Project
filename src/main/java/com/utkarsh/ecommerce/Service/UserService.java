@@ -1,5 +1,6 @@
 package com.utkarsh.ecommerce.Service;
 
+import com.utkarsh.ecommerce.DTO.UserResponseDTO;
 import com.utkarsh.ecommerce.Entity.User;
 import com.utkarsh.ecommerce.Repository.UserRepository;
 import com.utkarsh.ecommerce.DTO.UserRegistrationRequestDTO;
@@ -20,8 +21,8 @@ public class UserService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
-    public User registerUser(UserRegistrationRequestDTO requestDTO) {
+    public UserResponseDTO registerUser(
+            UserRegistrationRequestDTO requestDTO) {
 
         if (userRepository.existsByEmail(requestDTO.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
@@ -38,6 +39,16 @@ public class UserService {
 
         user.setRole("USER");
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        UserResponseDTO responseDTO = new UserResponseDTO();
+
+        responseDTO.setId(savedUser.getId());
+        responseDTO.setName(savedUser.getName());
+        responseDTO.setEmail(savedUser.getEmail());
+        responseDTO.setRole(savedUser.getRole());
+
+        return responseDTO;
     }
+
 }
