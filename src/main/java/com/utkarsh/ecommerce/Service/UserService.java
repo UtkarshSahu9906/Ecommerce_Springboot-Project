@@ -1,5 +1,6 @@
 package com.utkarsh.ecommerce.Service;
 
+import com.utkarsh.ecommerce.DTO.LoginRequestDTO;
 import com.utkarsh.ecommerce.DTO.UserResponseDTO;
 import com.utkarsh.ecommerce.Entity.User;
 import com.utkarsh.ecommerce.Repository.UserRepository;
@@ -47,6 +48,30 @@ public class UserService {
         responseDTO.setName(savedUser.getName());
         responseDTO.setEmail(savedUser.getEmail());
         responseDTO.setRole(savedUser.getRole());
+
+        return responseDTO;
+    }
+    public UserResponseDTO login(LoginRequestDTO requestDTO) {
+
+        User user = userRepository.findByEmail(requestDTO.getEmail())
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Invalid email or password"));
+
+        boolean passwordMatches = passwordEncoder.matches(
+                requestDTO.getPassword(),
+                user.getPassword()
+        );
+
+        if (!passwordMatches) {
+            throw new IllegalArgumentException("Invalid email or password");
+        }
+
+        UserResponseDTO responseDTO = new UserResponseDTO();
+
+        responseDTO.setId(user.getId());
+        responseDTO.setName(user.getName());
+        responseDTO.setEmail(user.getEmail());
+        responseDTO.setRole(user.getRole());
 
         return responseDTO;
     }

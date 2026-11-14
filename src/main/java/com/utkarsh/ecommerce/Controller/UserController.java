@@ -1,5 +1,6 @@
 package com.utkarsh.ecommerce.Controller;
 
+import com.utkarsh.ecommerce.DTO.LoginRequestDTO;
 import com.utkarsh.ecommerce.Service.UserService;
 import com.utkarsh.ecommerce.DTO.UserRegistrationRequestDTO;
 import com.utkarsh.ecommerce.DTO.UserResponseDTO;
@@ -24,5 +25,11 @@ public class UserController {
             @Valid @RequestBody UserRegistrationRequestDTO requestDTO) {
 
         return userService.registerUser(requestDTO);
+    }
+    @PostMapping("/login")
+    public UserResponseDTO login(
+            @Valid @RequestBody LoginRequestDTO requestDTO) {
+
+        return userService.login(requestDTO);
     }
 }
