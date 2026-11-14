@@ -21,6 +21,13 @@ public class ProductController {
         this.productService = productService;
     }
 
+    @GetMapping("/search")
+    public List<ProductResponseDTO> searchProducts(
+            @RequestParam String name) {
+
+        return productService.searchProductsByName(name);
+    }
+
     @PostMapping
     public ProductResponseDTO createProduct(
             @Valid @RequestBody ProductRequestDTO requestDTO) {

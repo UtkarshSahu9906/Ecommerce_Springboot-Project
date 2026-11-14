@@ -29,6 +29,20 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
+    public List<ProductResponseDTO> searchProductsByName(String name) {
+
+        List<Product> products =
+                productRepository.findByNameContainingIgnoreCase(name);
+
+        List<ProductResponseDTO> responseList = new ArrayList<>();
+
+        for (Product product : products) {
+            responseList.add(convertToResponseDTO(product));
+        }
+
+        return responseList;
+    }
+
     private ProductResponseDTO convertToResponseDTO(Product product) {
 
         ProductResponseDTO responseDTO = new ProductResponseDTO();
