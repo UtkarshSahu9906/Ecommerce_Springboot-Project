@@ -35,6 +35,19 @@ public class CartController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/items/{productId}")
+    public ResponseEntity<CartResponseDTO> removeCartItem(
+            @PathVariable Long productId,
+            Authentication authentication) {
+
+        CartResponseDTO response = cartService.removeCartItem(
+                authentication.getName(),
+                productId
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping
     public ResponseEntity<CartResponseDTO> getCart(
             Authentication authentication) {

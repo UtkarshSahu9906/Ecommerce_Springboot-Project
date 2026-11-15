@@ -33,6 +33,34 @@ public class CartService {
     }
 
     @Transactional
+    public CartResponseDTO removeCartItem(String email, Long productId) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        Cart cart = cartRepository.findByUserId(user.getId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Cart not found"));
+
+        CartItem cartItem = cart.getItems()
+                .stream()
+                .filter(item ->
+                        item.getProduct().getId().equals(productId))
+                .findFirst()
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Product not found in cart"));
+
+        // Remove item from cart
+        cart.getItems().remove(cartItem);
+
+        cartRepository.save(cart);
+
+        return convertToCartResponseDTO(cart);
+    }
+
+    @Transactional
     public CartResponseDTO updateCartItem(
             String email,
             Long productId,
