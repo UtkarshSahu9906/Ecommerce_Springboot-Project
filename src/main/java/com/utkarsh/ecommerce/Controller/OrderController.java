@@ -42,7 +42,18 @@ public class OrderController {
         );
     }
 
-    // Get a specific order
+    @PutMapping("/{orderId}/cancel")
+    public ResponseEntity<OrderResponseDTO> cancelOrder(
+            @PathVariable Long orderId,
+            Authentication authentication
+    ) {
+        String email = authentication.getName();
+
+        return ResponseEntity.ok(
+                orderService.cancelOrder(email, orderId)
+        );
+    }
+
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponseDTO> getMyOrderById(
             @PathVariable Long orderId,

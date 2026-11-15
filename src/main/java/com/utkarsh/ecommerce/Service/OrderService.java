@@ -59,6 +59,45 @@ public class OrderService {
                 items
         );
     }
+
+    @Transactional
+    public OrderResponseDTO cancelOrder(String email, Long orderId) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        Order order = orderRepository.findByIdAndUserId(
+                orderId, user.getId()
+        ).orElseThrow(() ->
+                new ResourceNotFoundException("Order not found"));
+
+        // Only placed orders can be cancelled
+        if (!order.getStatus().equals("PLACED")) {
+            throw new IllegalArgumentException(
+                    "Only placed orders can be cancelled"
+            );
+        }
+
+        // Restore product stock
+        for (OrderItem item : order.getItems()) {
+
+            Product product = item.getProduct();
+
+            product.setStock(
+                    product.getStock() + item.getQuantity()
+            );
+
+            productRepository.save(product);
+        }
+
+        // Update order status
+        order.setStatus("CANCELLED");
+
+        Order updatedOrder = orderRepository.save(order);
+
+        return convertToOrderResponseDTO(updatedOrder);
+    }
     @Transactional
     public List<OrderResponseDTO> getMyOrders(String email) {
 
