@@ -32,6 +32,47 @@ public class CartService {
         this.productRepository = productRepository;
     }
 
+    @Transactional
+    public CartResponseDTO updateCartItem(
+            String email,
+            Long productId,
+            Integer quantity) {
+
+        if (quantity == null || quantity < 1) {
+            throw new IllegalArgumentException(
+                    "Quantity must be at least 1");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        Cart cart = cartRepository.findByUserId(user.getId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Cart not found"));
+
+        CartItem cartItem = cart.getItems()
+                .stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst()
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Product not found in cart"));
+
+        Product product = cartItem.getProduct();
+
+        if (quantity > product.getStock()) {
+            throw new IllegalArgumentException(
+                    "Insufficient product stock");
+        }
+
+        cartItem.setQuantity(quantity);
+
+        cartRepository.save(cart);
+
+        return convertToCartResponseDTO(cart);
+    }
+
     private CartResponseDTO convertToCartResponseDTO(Cart cart) {
 
         List<CartItemResponseDTO> itemDTOs = cart.getItems()

@@ -3,7 +3,7 @@ package com.utkarsh.ecommerce.Controller;
 import com.utkarsh.ecommerce.Service.CartService;
 import com.utkarsh.ecommerce.dto.AddToCartRequestDTO;
 import com.utkarsh.ecommerce.dto.CartResponseDTO;
-
+import com.utkarsh.ecommerce.dto.UpdateCartItemRequestDTO;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -18,6 +18,21 @@ public class CartController {
 
     public CartController(CartService cartService) {
         this.cartService = cartService;
+    }
+
+    @PutMapping("/items/{productId}")
+    public ResponseEntity<CartResponseDTO> updateCartItem(
+            @PathVariable Long productId,
+            @Valid @RequestBody UpdateCartItemRequestDTO request,
+            Authentication authentication) {
+
+        CartResponseDTO response = cartService.updateCartItem(
+                authentication.getName(),
+                productId,
+                request.getQuantity()
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
