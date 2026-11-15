@@ -31,7 +31,24 @@ public class CartService {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
     }
+    @Transactional
+    public void clearCart(String email) {
 
+        // Find logged-in user
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        // Find user's cart
+        Cart cart = cartRepository.findByUserId(user.getId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Cart not found"));
+
+        // Remove all cart items
+        cart.getItems().clear();
+
+        cartRepository.save(cart);
+    }
     @Transactional
     public CartResponseDTO removeCartItem(String email, Long productId) {
 
