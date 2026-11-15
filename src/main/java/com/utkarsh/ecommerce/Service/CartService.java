@@ -2,9 +2,15 @@ package com.utkarsh.ecommerce.Service;
 
 import com.utkarsh.ecommerce.Entity.*;
 import com.utkarsh.ecommerce.Repository.*;
+import com.utkarsh.ecommerce.dto.AddToCartRequestDTO;
+import com.utkarsh.ecommerce.dto.CartItemResponseDTO;
+import com.utkarsh.ecommerce.dto.CartResponseDTO;
 import com.utkarsh.ecommerce.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class CartService {
@@ -26,48 +32,102 @@ public class CartService {
         this.productRepository = productRepository;
     }
 
-    @Transactional
-    public Cart addToCart(Long userId, Long productId, Integer quantity) {
+    private CartResponseDTO convertToCartResponseDTO(Cart cart) {
 
-        // 1. Find user
-        User user = userRepository.findById(userId)
+        List<CartItemResponseDTO> itemDTOs = cart.getItems()
+                .stream()
+                .map(item -> {
+
+                    CartItemResponseDTO dto = new CartItemResponseDTO();
+
+                    dto.setProductId(item.getProduct().getId());
+                    dto.setProductName(item.getProduct().getName());
+                    dto.setPrice(item.getProduct().getPrice());
+                    dto.setQuantity(item.getQuantity());
+
+                    BigDecimal subtotal = item.getProduct()
+                            .getPrice()
+                            .multiply(BigDecimal.valueOf(item.getQuantity()));
+
+                    dto.setSubtotal(subtotal);
+
+                    return dto;
+                })
+                .toList();
+
+        BigDecimal totalPrice = itemDTOs.stream()
+                .map(CartItemResponseDTO::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        int totalItems = itemDTOs.stream()
+                .mapToInt(CartItemResponseDTO::getQuantity)
+                .sum();
+
+        CartResponseDTO response = new CartResponseDTO();
+
+        response.setCartId(cart.getId());
+        response.setItems(itemDTOs);
+        response.setTotalItems(totalItems);
+        response.setTotalPrice(totalPrice);
+
+        return response;
+    }
+
+    @Transactional
+    public CartResponseDTO addToCart(
+            String email,
+            AddToCartRequestDTO request) {
+
+        // Find logged-in user
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found"));
 
-        // 2. Find product
-        Product product = productRepository.findById(productId)
+        // Find product
+        Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Product not found"));
 
-        // 3. Find existing cart or create a new one
-        Cart cart = cartRepository.findByUserId(userId)
+        // Find existing cart or create a new cart
+        Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseGet(() -> {
                     Cart newCart = new Cart();
                     newCart.setUser(user);
                     return cartRepository.save(newCart);
                 });
 
-        // 4. Check whether product already exists in cart
+        // Find existing cart item
         CartItem existingItem = cart.getItems()
                 .stream()
-                .filter(item ->
-                        item.getProduct().getId().equals(productId))
+                .filter(item -> item.getProduct().getId()
+                        .equals(product.getId()))
                 .findFirst()
                 .orElse(null);
 
-        // 5. Add new item or increase quantity
+        int currentQuantity = existingItem == null
+                ? 0 : existingItem.getQuantity();
+
+        int newQuantity = currentQuantity + request.getQuantity();
+
+        // Check available stock
+        if (newQuantity > product.getStock()) {
+            throw new IllegalArgumentException("Insufficient product stock");
+        }
+
+        // Update existing item or create a new item
         if (existingItem != null) {
-            existingItem.setQuantity(
-                    existingItem.getQuantity() + quantity);
+            existingItem.setQuantity(newQuantity);
         } else {
             CartItem cartItem = new CartItem();
             cartItem.setCart(cart);
             cartItem.setProduct(product);
-            cartItem.setQuantity(quantity);
+            cartItem.setQuantity(request.getQuantity());
 
             cart.getItems().add(cartItem);
         }
 
-        return cartRepository.save(cart);
+        cartRepository.save(cart);
+
+        return convertToCartResponseDTO(cart);
     }
 }
