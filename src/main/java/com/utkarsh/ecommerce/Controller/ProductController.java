@@ -7,6 +7,7 @@ import com.utkarsh.ecommerce.dto.ProductRequestDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class ProductController {
 
         return productService.searchProducts(name, page, size);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ProductResponseDTO createProduct(
             @Valid @RequestBody ProductRequestDTO requestDTO) {
@@ -46,6 +47,8 @@ public class ProductController {
     public ProductResponseDTO getProductById(@PathVariable Long id) {
         return productService.getProductById(id);
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ProductResponseDTO updateProduct(
             @PathVariable Long id,
@@ -53,6 +56,7 @@ public class ProductController {
 
         return productService.updateProduct(id, requestDTO);
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
 

@@ -6,6 +6,7 @@ import com.utkarsh.ecommerce.Entity.Category;
 import com.utkarsh.ecommerce.Service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public CategoryResponseDTO createCategory(
             @Valid @RequestBody CategoryRequestDTO requestDTO) {
@@ -37,6 +38,7 @@ public class CategoryController {
     public CategoryResponseDTO getCategoryById(@PathVariable Long id) {
         return categoryService.getCategoryById(id);
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public CategoryResponseDTO updateCategory(
             @PathVariable Long id,
@@ -44,6 +46,7 @@ public class CategoryController {
 
         return categoryService.updateCategory(id, requestDTO);
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
 
