@@ -1,156 +1,275 @@
-# E-Commerce Backend (Spring Boot)
+# E-Commerce Backend – Spring Boot
 
-A REST API for a small online store, built with Spring Boot. I made this project to show the backend skills I would bring to a development team: clean layered code, secure authentication, solid database design and reliable business logic.
+A REST API for an online store, built using Spring Boot, Spring Security, JPA, and MySQL.
 
-**A note on scope:** this is a compact project, not a production-scale platform. I kept it focused on the core flow of an online store (catalog, cart, orders) and put my effort into doing those parts properly rather than adding features for the sake of it.
+This project demonstrates backend development concepts including REST API design, layered architecture, JWT authentication, role-based authorization, database relationships, and e-commerce business logic.
 
-## What it does
+**Project scope:** This is a learning and portfolio project focused on the core functionality of an e-commerce application: user authentication, product management, shopping carts, and order processing.
 
-- Register and log in with JWT authentication, with passwords hashed using BCrypt
-- Role-based access: `USER` and `ADMIN`. Only admins can manage products, categories and order statuses
-- Product browsing with pagination, sorting, search by name, and filters for category and price range
-- Per-user cart: add, update and remove items, with the total calculated on the server
-- Order placement from the cart. Stock is checked and reduced, the cart is cleared, and everything runs in one transaction, so a failure never leaves half-saved data
-- Order history, order cancellation (stock is restored), and admin order status updates: `PLACED → CONFIRMED → SHIPPED → DELIVERED`
+## Features
 
-## Tech stack
+- User registration and login with JWT authentication.
+- Password encryption using BCrypt.
+- Role-based authorization with `USER` and `ADMIN` roles.
+- Admin-only product and category management.
+- Product listing with pagination and sorting.
+- Product search by name.
+- Shopping cart management: add, update, remove, and clear items.
+- Server-side cart total calculation.
+- Order placement with stock validation.
+- Automatic stock reduction after successful order placement.
+- Order history and individual order details.
+- Order cancellation with stock restoration.
+- Transaction management using `@Transactional`.
+- Global exception handling and request validation.
+- Swagger UI documentation.
 
-Java 17, Spring Boot 3, Spring Web, Spring Data JPA (Hibernate), Spring Security with JWT, MySQL, Maven, Lombok, springdoc-openapi (Swagger), JUnit 5 and Mockito.
+## Technology Stack
 
-## Skills this project demonstrates
-
-| Area | What's in the project |
+| Technology | Purpose |
 |---|---|
-| REST API design | Resource-based endpoints, proper HTTP methods and status codes |
-| Security | JWT auth with a custom filter, BCrypt hashing, role-based authorization. The user is always read from the token, never from the request |
-| Database design | Normalised schema with one-to-one, one-to-many and many-to-one relationships. Order items store the price at purchase time |
-| Business logic | Stock validation, cart totals, order lifecycle and cancellation rules, all in the service layer |
-| Data integrity | `@Transactional` on multi-table operations such as placing and cancelling an order |
-| Clean code | Controller → Service → Repository layering, DTOs instead of exposing entities, input validation |
-| Error handling | Custom exceptions and a global handler that returns a consistent JSON error format |
-| Testing | Unit tests with JUnit and Mockito, controller tests with MockMvc |
-| Documentation | Swagger UI, Postman collection, and this README |
+| Java 27 | Programming language |
+| Spring Boot 4.1.2 | Backend framework |
+| Spring Web | REST API development |
+| Spring Data JPA | Database operations |
+| Hibernate | ORM |
+| Spring Security | Authentication and authorization |
+| JWT | Token-based authentication |
+| BCrypt | Password hashing |
+| MySQL | Relational database |
+| Maven | Dependency management |
+| Lombok | Boilerplate reduction |
+| Springdoc OpenAPI | Swagger API documentation |
 
-## How it's organised
+## Project Architecture
 
-```
-com.yourname.ecommerce
-├── config        security and swagger setup
-├── controller    REST endpoints
-├── service       business logic (interfaces + impl)
-├── repository    JPA repositories
-├── entity        database tables
-├── dto           request / response objects
-├── exception     custom exceptions and global handler
-├── security      JWT filter, token utility, user details
-└── util          helpers
+The application follows a layered architecture:
+
+```text
+Controller → Service → Repository → Database
 ```
 
-Controllers only handle HTTP, services hold the business rules, and repositories handle the database. Each layer talks only to the one below it.
+- **Controller:** Handles HTTP requests and responses.
+- **Service:** Contains business logic.
+- **Repository:** Handles database operations.
+- **Entity:** Represents database tables.
+- **DTO:** Transfers request and response data.
+- **Security:** Handles JWT authentication and authorization.
+- **Exception:** Handles application exceptions.
 
-## Database
+The main Java package is:
 
-Main tables: `User`, `Category`, `Product`, `Cart`, `CartItem`, `Order`, `OrderItem`.
-
-- A category has many products
-- A user has one cart, and a cart has many cart items
-- A user has many orders, and an order has many order items
-
-## API endpoints
-
-**Auth**
-- `POST /api/auth/register` (public)
-- `POST /api/auth/login` (public)
-
-**Categories**
-- `GET /api/categories` (public)
-- `POST`, `PUT /{id}`, `DELETE /{id}` (admin)
-
-**Products**
-- `GET /api/products` and `GET /api/products/{id}` (public)
-- `POST`, `PUT /{id}`, `DELETE /{id}` (admin)
-
-**Cart** (logged-in user)
-- `GET /api/cart`
-- `POST /api/cart/items`
-- `PUT /api/cart/items/{itemId}`
-- `DELETE /api/cart/items/{itemId}`
-
-**Orders**
-- `POST /api/orders` place an order (user)
-- `GET /api/orders` my orders (user)
-- `GET /api/orders/{id}` (user or admin)
-- `PUT /api/orders/{id}/cancel` (user)
-- `PUT /api/orders/{id}/status` (admin)
-
-Example search:
-
-```
-GET /api/products?keyword=phone&categoryId=2&minPrice=5000&maxPrice=30000&page=0&size=10&sort=price,asc
+```text
+com.utkarsh.ecommerce
 ```
 
-Errors come back in a consistent format:
+## Database Design
 
-```json
-{
-  "timestamp": "2026-11-13T01:30:00",
-  "status": 404,
-  "message": "Product not found with id: 99"
-}
+The project contains the following main entities:
+
+- User
+- Category
+- Product
+- Cart
+- CartItem
+- Order
+- OrderItem
+
+### Entity Relationships
+
+- One category can have multiple products.
+- One user has one cart.
+- One cart can contain multiple cart items.
+- One user can place multiple orders.
+- One order can contain multiple order items.
+- Order items preserve the product price at the time of purchase.
+
+## API Endpoints
+
+All endpoints require JWT authentication except registration and login.
+
+### Authentication
+
+| Method | Endpoint | Access |
+|---|---|---|
+| POST | `/api/users/register` | Public |
+| POST | `/api/users/login` | Public |
+
+### Categories
+
+| Method | Endpoint | Access |
+|---|---|---|
+| GET | `/api/categories` | Authenticated |
+| POST | `/api/categories` | ADMIN |
+| PUT | `/api/categories/{id}` | ADMIN |
+| DELETE | `/api/categories/{id}` | ADMIN |
+
+### Products
+
+| Method | Endpoint | Access |
+|---|---|---|
+| GET | `/api/products` | Authenticated |
+| GET | `/api/products/{id}` | Authenticated |
+| POST | `/api/products` | ADMIN |
+| PUT | `/api/products/{id}` | ADMIN |
+| DELETE | `/api/products/{id}` | ADMIN |
+| GET | `/api/products/sort` | Authenticated |
+
+The product module also supports pagination and searching by product name.
+
+### Cart
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/cart/add` | Add a product to cart |
+| GET | `/api/cart` | View the current user's cart |
+| PUT | `/api/cart/items/{productId}` | Update cart item quantity |
+| DELETE | `/api/cart/items/{productId}` | Remove an item |
+| DELETE | `/api/cart/clear` | Clear the cart |
+
+All cart endpoints require authentication.
+
+### Orders
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/orders` | Place an order |
+| GET | `/api/orders` | View order history |
+| GET | `/api/orders/{orderId}` | View a specific order |
+| PUT | `/api/orders/{orderId}/cancel` | Cancel an eligible order |
+
+Users can access their own orders. Order cancellation is permitted only when the order status is `PLACED`.
+
+## Authentication Flow
+
+1. Register a new account using `/api/users/register`.
+2. Log in using `/api/users/login`.
+3. Copy the JWT token returned by the login API.
+4. Include the token in the Authorization header when accessing protected endpoints.
+
+Example:
+
+```http
+Authorization: Bearer your_jwt_token
 ```
 
-## Running it locally
+### Role-Based Authorization
 
-You'll need JDK 17+, Maven and MySQL.
+The application supports two roles:
 
-1. Clone the repo
-   ```bash
-   git clone https://github.com/<your-username>/<your-repo-name>.git
-   cd <your-repo-name>
-   ```
-2. Create a database
-   ```sql
-   CREATE DATABASE ecommerce_db;
-   ```
-3. Set these environment variables (no secrets are stored in the repo):
+- `USER`: Can manage their own cart and orders.
+- `ADMIN`: Can manage products and categories.
 
-   | Variable | Example |
-   |---|---|
-   | `DB_URL` | `jdbc:mysql://localhost:3306/ecommerce_db` |
-   | `DB_USERNAME` | `root` |
-   | `DB_PASSWORD` | your password |
-   | `JWT_SECRET` | any long random string |
+Newly registered users receive the `USER` role by default.
 
-4. Start the app
-   ```bash
-   mvn spring-boot:run
-   ```
+## Running the Project Locally
 
-The app runs on `http://localhost:8080`, and Swagger UI is at `http://localhost:8080/swagger-ui/index.html`.
+### Prerequisites
 
-To call protected endpoints, log in, copy the token, and send it as `Authorization: Bearer <token>`. A Postman collection is available in the `postman` folder.
+- Java 27
+- Maven
+- MySQL
+- Git
 
-## Tests
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/UtkarshSahu9906/Ecommerce_Springboot-Project.git
+
+cd Ecommerce_Springboot-Project
+```
+
+### 2. Create the database
+
+```sql
+CREATE DATABASE ecomerse_db;
+```
+
+### 3. Configure environment variables
+
+Configure the following environment variables in your IDE run configuration or terminal:
+
+| Variable | Description |
+|---|---|
+| `DB_URL` | MySQL database connection URL |
+| `DB_USERNAME` | MySQL username |
+| `DB_PASSWORD` | MySQL password |
+| `JWT_SECRET` | Secret key used for JWT signing |
+
+Example database URL:
+
+```text
+jdbc:mysql://localhost:3306/ecomerse_db
+```
+
+Use your own database credentials and a securely generated JWT secret. Never commit passwords or secret keys to GitHub.
+
+### 4. Run the application
+
+```bash
+mvn spring-boot:run
+```
+
+The application starts at:
+
+```text
+http://localhost:8080
+```
+
+## Swagger API Documentation
+
+Swagger UI is available at:
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+You can use Swagger UI to:
+
+- Explore available API endpoints.
+- View request and response structures.
+- Test API requests.
+- Authorize protected endpoints using your JWT token.
+
+## Running Tests
+
+Execute the following command:
 
 ```bash
 mvn test
 ```
 
-## What I can bring to a team
+## Future Improvements
 
-- I write readable, layered code that other developers can pick up and extend
-- I think about security and data integrity from the start, not as an afterthought
-- I handle edge cases like stock checks, failed transactions and bad input
-- I document my work so others can run and test it quickly
-- I'm comfortable taking a feature from database design to a tested API
+Potential improvements for future versions:
 
-## Possible next steps
+- Automated unit and integration tests.
+- Inventory concurrency protection.
+- Improved API sorting validation.
+- Product image upload.
+- Address management.
+- Payment gateway integration.
+- Email notifications.
+- Docker and cloud deployment.
 
-Product image upload, address management, a payment flow, email notifications, Redis caching, and Docker with cloud deployment.
+## What This Project Demonstrates
+
+- REST API development using Spring Boot.
+- Layered application architecture.
+- JWT-based authentication.
+- Role-based authorization.
+- Database relationships using JPA and Hibernate.
+- DTO-based request and response handling.
+- Transactional business operations.
+- Input validation and exception handling.
+- API documentation using Swagger.
 
 ## Contact
 
-**Your Name**
-GitHub: [@UtkarshSahu9906](https://github.com/UtkarshSahu9906) · LinkedIn: [your-linkedin](https://in.linkedin.com/in/utkarshsahu9906) · utkarshsahu9906@gmail.com
+**Utkarsh Sahu**
 
-I'm open to backend developer roles and would be glad to talk about this project.
+- GitHub: https://github.com/UtkarshSahu9906
+- LinkedIn: https://in.linkedin.com/in/utkarshsahu9906
+- Email: utkarshsahu9906@gmail.com
+
+I am interested in backend development opportunities and continuously improving my skills in Java and Spring Boot.
