@@ -72,6 +72,22 @@ public class CartService {
 
         return response;
     }
+    @Transactional(readOnly = true)
+    public CartResponseDTO getCart(String email) {
+
+        // Find logged-in user
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        // Find user's cart
+        Cart cart = cartRepository.findByUserId(user.getId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Cart not found"));
+
+        // Convert entity into DTO
+        return convertToCartResponseDTO(cart);
+    }
 
     @Transactional
     public CartResponseDTO addToCart(

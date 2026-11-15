@@ -20,6 +20,17 @@ public class CartController {
         this.cartService = cartService;
     }
 
+    @GetMapping
+    public ResponseEntity<CartResponseDTO> getCart(
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        CartResponseDTO response = cartService.getCart(email);
+
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/add")
     public ResponseEntity<CartResponseDTO> addToCart(
             @Valid @RequestBody AddToCartRequestDTO request,
