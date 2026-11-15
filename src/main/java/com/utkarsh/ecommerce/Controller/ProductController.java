@@ -3,7 +3,7 @@ package com.utkarsh.ecommerce.Controller;
 import com.utkarsh.ecommerce.DTO.ProductResponseDTO;
 import com.utkarsh.ecommerce.Service.ProductService;
 import com.utkarsh.ecommerce.dto.ProductRequestDTO;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
+@SecurityRequirement(name = "Bearer Authentication")
 public class ProductController {
 
     private final ProductService productService;

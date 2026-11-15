@@ -4,6 +4,7 @@ import com.utkarsh.ecommerce.Service.CartService;
 import com.utkarsh.ecommerce.dto.AddToCartRequestDTO;
 import com.utkarsh.ecommerce.dto.CartResponseDTO;
 import com.utkarsh.ecommerce.dto.UpdateCartItemRequestDTO;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/cart")
+@SecurityRequirement(name = "Bearer Authentication")
 public class CartController {
 
     private final CartService cartService;
