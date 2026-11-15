@@ -1,0 +1,57 @@
+package com.utkarsh.ecommerce.Controller;
+
+import com.utkarsh.ecommerce.Service.OrderService;
+import com.utkarsh.ecommerce.DTO.OrderResponseDTO;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/orders")
+public class OrderController {
+
+    private final OrderService orderService;
+
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
+
+    // Place a new order
+    @PostMapping
+    public ResponseEntity<OrderResponseDTO> placeOrder(
+            Authentication authentication
+    ) {
+        String email = authentication.getName();
+
+        return ResponseEntity.ok(
+                orderService.placeOrder(email)
+        );
+    }
+
+    // Get logged-in user's order history
+    @GetMapping
+    public ResponseEntity<List<OrderResponseDTO>> getMyOrders(
+            Authentication authentication
+    ) {
+        String email = authentication.getName();
+
+        return ResponseEntity.ok(
+                orderService.getMyOrders(email)
+        );
+    }
+
+    // Get a specific order
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderResponseDTO> getMyOrderById(
+            @PathVariable Long orderId,
+            Authentication authentication
+    ) {
+        String email = authentication.getName();
+
+        return ResponseEntity.ok(
+                orderService.getMyOrderById(email, orderId)
+        );
+    }
+}
